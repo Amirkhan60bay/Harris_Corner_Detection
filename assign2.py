@@ -39,12 +39,22 @@ def smooth1D(img, sigma) :
 
 
     # TODO: form a 1D horizontal Guassian filter of an appropriate size
+    x = np.arange(-5,6)
+    filter = np.exp((x**2)/-2/(sigma**2))
+    filter = filter[1:-1]
 
     # TODO: convolve the 1D filter with the image;
     #       apply partial filter for the image border
+    result = convolve1d(img,filter,1,np.float64,'constant')
 
+    y_model = np.array([0.299, 0.587, 0.115], dtype=np.float64) #just creating array with all values equal 1
+    all_values_1 = img @ y_model
+    all_values_1.fill(1)
+
+    weight = convolve1d(all_values_1,filter,1,np.float64,'constant')
+    normalized_result = result/weight
+    img_smoothed = normalized_result
     return img_smoothed
-
 ################################################################################
 #  perform 2D smoothing using 1D convolutions
 ################################################################################

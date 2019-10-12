@@ -25,8 +25,9 @@ def rgb2gray(img_color) :
     #               the grayscale image
 
     # TODO: using the Y channel of the YIQ model to perform the conversion
-    y_model = np.array([0.299,0.587,0.115],dtype = np.float64)
+    y_model = np.array([0.299, 0.587, 0.115], dtype=np.float64)
     img_gray = img_color @ y_model
+    img_gray.fill(1)
     return img_gray
 
 ################################################################################
@@ -60,6 +61,7 @@ def main() :
 #     plt.imshow(np.uint8(img_color))
 #     plt.show()
 #     print(img_color[20,10])
+#     print(type(img_color))
 
     # perform RGB to gray conversion
     print('perform RGB to grayscale conversion...')
