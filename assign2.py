@@ -47,13 +47,10 @@ def smooth1D(img, sigma) :
     #       apply partial filter for the image border
     result = convolve1d(img,filter,1,np.float64,'constant')
 
-    y_model = np.array([0.299, 0.587, 0.115], dtype=np.float64) #just creating array with all values equal 1
-    all_values_1 = img @ y_model
+    all_values_1 = img
     all_values_1.fill(1)
-
     weight = convolve1d(all_values_1,filter,1,np.float64,'constant')
-    normalized_result = result/weight
-    img_smoothed = normalized_result
+    img_smoothed = result/weight
     return img_smoothed
 ################################################################################
 #  perform 2D smoothing using 1D convolutions
@@ -66,9 +63,10 @@ def smooth2D(img, sigma) :
     #    img_smoothed - a h x w numpy array holding the 2D smoothing result
 
     # TODO: smooth the image along the vertical direction
-
+    img_smoothed = smooth1D(img,sigma)
     # TODO: smooth the image along the horizontal direction
-
+    img_smoothed = smooth1D(img_smoothed.T,sigma)
+    img_smoothed = img_smoothed.T
     return img_smoothed
 
 ################################################################################
@@ -170,6 +168,9 @@ def main() :
     plt.imshow(np.float32(img_gray), cmap = 'gray')
     plt.show()
 
+    img_smoothed = smooth2D(img_gray,1)
+    plt.imshow(np.float32(img_smoothed),cmap = 'gray')
+    plt.show()
     # perform corner detection
     print('perform Harris corner detection...')
     corners = harris(img_gray, args.sigma, args.threshold)
