@@ -81,14 +81,33 @@ def harris(img, sigma, threshold) :
     #    corners - a list of tuples (x, y, r) specifying the coordinates
     #              (up to sub-pixel accuracy) and cornerness value of each corner
 
-    # TODO: compute Ix & Iy
+    #  TODO: compute Ix & Iy
+    Ix = img
+    Iy = img
+    #computing Ix
+    for y in range(img.shape[0]):
+        for x in range(1,img.shape[1]-1): # central difference for non-border case
+            Ix[y][x]=(img[y][x+1]-img[y][x-1])/2
+        Ix[y][0] = img[y][1]-img[y][0] # forward difference for x=0 border case
+        Ix[y][img.shape[1]-1] = img[y][img.shape[1]-1] - img[y][img.shape[1]-2] # backward difference for x=w-1 border case
+
+    for x in range(img.shape[1]):
+        for y in range(1,img.shape[0]-1):
+            Iy[y][x]=(img[y+1][x]-img[y-1][x])/2
+        Iy[0][x] = img[1][x]-img[0][x]
+        Iy[y][img.shape[0]-1] = img[img.shape[0]-1][x] - img[img.shape[0]-2][x]
 
     # TODO: compute Ix2, Iy2 and IxIy
-
+    Ix2 = np.multiply(Ix,Ix)
+    Iy2 = np.multiply(Iy,Iy)
+    IxIy = np.multiply(Ix,Iy)
     # TODO: smooth the squared derivatives
+    smoothed_Ix2 = smooth2D(Ix2,sigma)
+    smoothed_Iy2 = smooth2D(Iy2, sigma)
+    smoothed_IxIy = smooth2D(IxIy, sigma)
 
     # TODO: compute cornesness functoin R
-
+    R = (np.multiply(Ix2,Iy2) - np.multiply(IxIy,IxIy)) - 0.04*(np.multiply(Ix2+Iy2,Ix2+Iy2))
     # TODO: mark local maxima as corner candidates;
     #       perform quadratic approximation to local corners upto sub-pixel accuracy
 
@@ -165,12 +184,33 @@ def main() :
     print('perform RGB to grayscale conversion...')
     img_gray = rgb2gray(img_color)
     # uncomment the following 2 lines to show the grayscale image
-    plt.imshow(np.float32(img_gray), cmap = 'gray')
-    plt.show()
+    # plt.imshow(np.float32(img_gray), cmap = 'gray')
+    # plt.show()
+
+    # img = img_gray
+    # Ix = img
+    # Iy = img
+    # for y in range(img.shape[0]):
+    #     for x in range(1,img.shape[1]-1): # central difference for non-border case
+    #         Ix[y][x]=(img[y][x+1]-img[y][x-1])/2
+    #     Ix[y][0] = img[y][1]-img[y][0] # forward difference for x=0 border case
+    #     Ix[y][img.shape[1]-1] = img[y][img.shape[1]-1] - img[y][img.shape[1]-2] # backward difference for x=w-1 border case
+    #
+    # for x in range(img.shape[1]):
+    #     for y in range(1,img.shape[0]-1):
+    #         Iy[y][x]=(img[y+1][x]-img[y-1][x])/2
+    #     Iy[0][x] = img[1][x]-img[0][x]
+    #     Iy[y][img.shape[0]-1] = img[img.shape[0]-1][x] - img[img.shape[0]-2][x]
+    #
+    # Ix2 = np.multiply(Ix,Ix)
+    # print(type(Ix2))
+    # print(Ix2.shape)
+    # plt.imshow(np.float32(Ix), cmap = 'gray')
+    # plt.show()
 
     img_smoothed = smooth2D(img_gray,1)
-    plt.imshow(np.float32(img_smoothed),cmap = 'gray')
-    plt.show()
+    # plt.imshow(np.float32(img_smoothed),cmap = 'gray')
+    # plt.show()
     # perform corner detection
     print('perform Harris corner detection...')
     corners = harris(img_gray, args.sigma, args.threshold)
